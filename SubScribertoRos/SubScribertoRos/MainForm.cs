@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Threading;
+using System.IO;
 
 /// <summary>
 ///主要实现了WinForm与ROS进行socket通信的功能，
@@ -60,7 +61,10 @@ namespace SubScribertoRos
                     byte[] buffer = new byte[sks.Offset];
                     Array.Copy(sks.RecBuffer, buffer, sks.Offset);
                     string str = Encoding.UTF8.GetString(buffer);
-                    strPath = Environment.CurrentDirectory;
+
+                    strPath = Directory.GetParent( Environment.CurrentDirectory).Parent.FullName;
+                    //此方式针对vs运行的程序有效，如果为直接启动exe，需要注意图片的路径
+
                     switch (str.Substring(0,1))
                     {
                         case "1":
