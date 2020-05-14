@@ -67,19 +67,33 @@ namespace SubScribertoRos
         /// <summary>
         /// 重写Start方法,其实就是连接服务端
         /// </summary>
-        public override void Start()
+        public override bool Start()
         {
-            Connect();
+            return Connect();
         }
         /// <summary>
         /// 连接
         /// </summary>
-        private void Connect()
+        private bool Connect()
         {
-            client.Connect(ip);
-            nStream = new NetworkStream(client.Client, true);
-            sk = new Sockets(ip, client, nStream);
-            sk.nStream.BeginRead(sk.RecBuffer, 0, sk.RecBuffer.Length, new AsyncCallback(EndReader), sk);
+            try
+            {
+                client.Connect(ip);
+                nStream = new NetworkStream(client.Client, true);
+                sk = new Sockets(ip, client, nStream);
+                sk.nStream.BeginRead(sk.RecBuffer, 0, sk.RecBuffer.Length, new AsyncCallback(EndReader), sk);
+                return true;
+            }
+            catch(Exception skex)
+            {
+                Sockets sks = new Sockets();
+                sks.ex = skex;
+                sks.ClientDispose = true;
+                if (pushSockets != null)
+                    pushSockets.Invoke(sks);//推送至UI
+                return false;
+            }
+           
         }
         /// <summary>
         /// 读取

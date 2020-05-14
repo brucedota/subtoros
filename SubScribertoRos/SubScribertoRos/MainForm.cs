@@ -30,6 +30,7 @@ namespace SubScribertoRos
         public MainForm()
         {
             InitializeComponent();
+            btnDisconn.Enabled = false;
         }
 
         private void ReceiveMess(Sockets sks)
@@ -92,10 +93,24 @@ namespace SubScribertoRos
 
         private void btnConnect_Click(object sender, EventArgs e)
         {
+            if (tcpclient == null)
+            {
+                tcpclient = new TcpClients();
+                tcpclient.pushSockets = ReceiveMess;
+            }
             tcpclient.InitSocket(txtIP.Text, Convert.ToInt32(txtPort.Text));
-            tcpclient.Start();
-            btnConnect.Enabled = false;
-            btnDisconn.Enabled = true;
+            if (tcpclient.Start())
+            {
+                btnConnect.Enabled = false;
+                btnDisconn.Enabled = true;
+            }
+            else
+            {
+                MessageBox.Show("IP、Port Not correct");
+            }
+           
+
+
         }
 
         private void btnSend_Click(object sender, EventArgs e)
@@ -126,7 +141,6 @@ namespace SubScribertoRos
         private void panelMain_Paint(object sender, PaintEventArgs e)
         {
             updateUi = updatePanel; //用委托进行子线程更新UI
-           
         }
 
         private void updatePanel()
